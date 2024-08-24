@@ -4,6 +4,7 @@ using EntityFrameworkExample.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MoviesHubAPI.Migrations
 {
     [DbContext(typeof(ContextDB))]
-    partial class ContextDBModelSnapshot : ModelSnapshot
+    [Migration("20240824035819_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,6 +453,11 @@ namespace MoviesHubAPI.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time(7)");
 
+                    b.Property<int>("MediaId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("MediaId");
+
                     b.ToTable("Movie", (string)null);
                 });
 
@@ -599,6 +607,14 @@ namespace MoviesHubAPI.Migrations
                         .HasForeignKey("MoviesHubAPI.Models.MediaF.MovieF.Movie", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MoviesHubAPI.Models.MediaF.Media", "Media")
+                        .WithMany()
+                        .HasForeignKey("MediaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("MoviesHubAPI.Models.Genders.Gender", b =>
