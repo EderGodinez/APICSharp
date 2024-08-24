@@ -9,7 +9,8 @@
 *.user
 *.userosscache
 *.sln.docstates
-
+MoviesHubAPI/appsettings.json
+MoviesHubAPI/bin
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
