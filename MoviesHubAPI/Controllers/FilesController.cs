@@ -11,12 +11,23 @@ namespace MoviesHubAPI.Controllers
     public class FilesController : ControllerBase
     {
         private readonly IFilesService _fileService;
+        /// <summary>
+        /// Inicializa una nueva instancia del controlador <see cref="FilesController"/>.
+        /// </summary>
+        /// <param name="fileService">Servicio para manejar operaciones de archivos.</param>
         public FilesController(IFilesService fileService)
         {
             _fileService = fileService;
         }
 
-        // GET api/<FilesController>/5
+        /// <summary>
+        /// Obtiene un archivo por su identificador.
+        /// </summary>
+        /// <param name="id">El identificador del archivo.</param>
+        /// <returns>El archivo si se encuentra; de lo contrario, un mensaje de error.</returns>
+        /// <response code="200">Devuelve el archivo solicitado.</response>
+        /// <response code="404">Si el archivo no se encuentra.</response>
+        /// <response code="500">Si ocurre un error interno en el servidor.</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFile(string id)
         {
@@ -39,7 +50,13 @@ namespace MoviesHubAPI.Controllers
             }
         }
 
-        // POST api/<FilesController>
+        /// <summary>
+        /// Sube un nuevo archivo.
+        /// </summary>
+        /// <param name="model">El modelo que contiene el archivo a subir.</param>
+        /// <returns>La ruta del archivo subido si tiene éxito; de lo contrario, un mensaje de error.</returns>
+        /// <response code="200">Devuelve la ruta del archivo subido.</response>
+        /// <response code="400">Si el archivo no es válido o no se puede subir.</response>
         [HttpPost]
         public async Task<IActionResult> UploadFile(FileUploadModel model)
         {
@@ -54,7 +71,14 @@ namespace MoviesHubAPI.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-        // DELETE api/<FilesController>/5
+        /// <summary>
+        /// Elimina un archivo por su identificador.
+        /// </summary>
+        /// <param name="id">El identificador del archivo.</param>
+        /// <returns>Un mensaje de éxito o un error.</returns>
+        /// <response code="200">Si el archivo se elimina con éxito.</response>
+        /// <response code="400">Si el identificador no es válido o el archivo no se puede eliminar.</response>
+        /// <response code="500">Si ocurre un error interno en el servidor.</response>
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFile(string id)

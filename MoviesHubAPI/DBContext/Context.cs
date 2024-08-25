@@ -1,18 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoviesHubAPI.Models.Genders;
-using MoviesHubAPI.Models.Genders.GenderListF;
-using MoviesHubAPI.Models.MediaF;
-using MoviesHubAPI.Models.MediaF.MovieF;
-using MoviesHubAPI.Models.MediaF.SerieF;
-using MoviesHubAPI.Models.MediaF.SerieF.EpisodeListF;
-using MoviesHubAPI.Models.MediaF.SerieF.Episodes;
-using MoviesHubAPI.Models.MediaF.SerieF.SeasonF;
-using MoviesHubAPI.Models.Platforms;
-using MoviesHubAPI.Models.Platforms.EnablePlatform;
-using MoviesHubAPI.Models.Platforms.MediaEnableIn;
-using MoviesHubAPI.Models.Ratings;
-using MoviesHubAPI.Models.UserF;
-using MoviesHubAPI.Models.UserActionsF;
+using MoviesHubAPI.Models;
+using MoviesHubAPI.Models.Configurations;
+
 
 namespace EntityFrameworkExample.Context
 {
@@ -23,21 +12,30 @@ namespace EntityFrameworkExample.Context
         { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            UserEntityConfig.setEntityConfig(modelBuilder.Entity<User>());
-            UserActionEntityConf.setEntityConfig(modelBuilder.Entity<UserAction>());
-            RatingEntityConfig.SetEntityConfig(modelBuilder.Entity<Rating>());
-            MovieEntityConfig.SetEntityConfig(modelBuilder.Entity<Movie>());
-            MediaEntityConfig.SetEntityConfig(modelBuilder.Entity<Media>());
-            PlatformEntityConfig.SetEntityConfig(modelBuilder.Entity<Platform>());
-            MediaAvailibleInEntityConfig.SetEntityConfig(modelBuilder.Entity<MediaAvailibleIn>());
-            GenderEntityConfig.SetEntityConfig(modelBuilder.Entity<Gender>());
-            GenderListEntityConfig.SetEntityConfig(modelBuilder.Entity<GenderList>());
-            SeasonEntityConfig.SetEntityConfig(modelBuilder.Entity<Season>());
-            EpisodeListEntityConfig.SetEntityConfig(modelBuilder.Entity<EpisodeList>());
-            EpisodeEntityConfig.SetEntityConfig(modelBuilder.Entity<Episode>());
+            modelBuilder.ApplyConfiguration(new MediaConfiguration());
+            modelBuilder.ApplyConfiguration(new MovieConfiguration());
+            modelBuilder.ApplyConfiguration(new EpisodeConfiguration());
+            modelBuilder.ApplyConfiguration(new EpisodesListConfiguration());
+            modelBuilder.ApplyConfiguration(new GenderConfiguration());
+            modelBuilder.ApplyConfiguration(new GendersListConfiguration());
+            modelBuilder.ApplyConfiguration(new MediaAvailibleInConfiguration());
+            modelBuilder.ApplyConfiguration(new PlatformConfiguration());
+            modelBuilder.ApplyConfiguration(new RatingConfiguration());
+            modelBuilder.ApplyConfiguration(new SeasonConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserActionConfiguration());
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Movie> Movies { get; set; }
-        public DbSet<Serie> Series { get; set; }
+        public DbSet<Media> Series { get; set; } 
+        public DbSet<Platform> Platforms { get; set; }
+        public DbSet<Gender> Genders { get; set; }
+        public DbSet<GenderList> GenderLists { get; set; }
+        public DbSet<Season> Seasons { get; set; }
+        public DbSet<Episode> Episodes { get; set; }
+        public DbSet<EpisodeList> EpisodeLists { get; set; }
+        public DbSet<UserAction> UserActions { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<MediaAvailibleIn> MediaAvailibleIn { get; set; }
     }
 }

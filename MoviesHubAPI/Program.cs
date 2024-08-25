@@ -1,12 +1,18 @@
 
 using EntityFrameworkExample.Context;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MoviesHubAPI.Helpers;
+using MoviesHubAPI.Services;
 using MoviesHubAPI.Services.Files;
 using MoviesHubAPI.Services.MovieS;
 using MoviesHubAPI.Services.Series;
 using MoviesHubAPI.Services.Users;
 using System.Reflection;
+using System.Text;
+
 
 namespace MoviesHubAPI
 {
@@ -22,14 +28,34 @@ namespace MoviesHubAPI
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IFilesService,FilesService >();
             builder.Services.AddTransient<IMovieService, MovieService>();
-            builder.Services.AddTransient<ISeriesService, SeriesService>();
+            builder.Services.AddTransient<ISerieService, SerieService>();
+            builder.Services.AddScoped<IAuthHelpers, AuthHelpers>();
             // Add services to the container.
             builder.Services.AddDbContext<ContextDB>(options =>
             {
                 
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-           
+            builder.Services.AddAuthentication(cfg => {
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8
+                        .GetBytes(builder.Configuration["ApplicationSettings:JWT_Secret"] ?? String.Empty)
+                    ),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+            Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection")," Y TOKEN : ", builder.Configuration["ApplicationSettings:JWT_Secret"]);
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -51,13 +77,13 @@ namespace MoviesHubAPI
                     docs.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieHub docs v1");
                 });
             }
-
+            app.UseCors("*");
             app.UseHttpsRedirection(); 
             
             app.UseStaticFiles();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
