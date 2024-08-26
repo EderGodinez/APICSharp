@@ -1,5 +1,6 @@
 ﻿
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.Movies.Responses;
 
 namespace MoviesHubAPI.Services.MovieS
@@ -11,6 +12,6 @@ namespace MoviesHubAPI.Services.MovieS
         Task<string> RegisterMovieAsync(Movie model);
         Task<string> UpdateMovieAsync(int id, Movie model);
         Task<string> DeleteMovieByIdAsync(int id);
-        Task<IEnumerable<Movie>> GetTrendingMoviesAsync();
+        Task <IEnumerable<TrendingDTO>> GetTrendingMovies();
     }
 }

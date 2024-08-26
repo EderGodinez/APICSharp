@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Services\Series\Response\" />
     <Folder Include="uploads\" />
   </ItemGroup>
 

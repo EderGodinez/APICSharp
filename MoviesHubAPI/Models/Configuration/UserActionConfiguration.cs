@@ -7,7 +7,7 @@ namespace MoviesHubAPI.Models.Configurations
     {
         public void Configure(EntityTypeBuilder<UserAction> builder)
         {
-            builder.HasKey(ua => new { ua.UserId, ua.MediaId });
+            builder.HasKey(ua => new { ua.UserId, ua.MediaId,ua.TypeAction });
 
             builder.Property(ua => ua.TypeAction)
                 .IsRequired()

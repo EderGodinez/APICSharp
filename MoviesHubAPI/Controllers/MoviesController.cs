@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.MovieS;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace MoviesHubAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class MoviesController : ControllerBase
     {   
@@ -91,9 +92,9 @@ namespace MoviesHubAPI.Controllers
         /// </summary>
         /// <returns>Lista de películas populares.</returns>
         [HttpGet("trending")]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetTrendingMovies()
+        public async Task<ActionResult<IEnumerable<TrendingDTO>>> GetTrendingMovies()
         {
-            var trendingMovies = await _movieService.GetTrendingMoviesAsync();
+            var trendingMovies = await _movieService.GetTrendingMovies();
             return Ok(trendingMovies);
         }
     }

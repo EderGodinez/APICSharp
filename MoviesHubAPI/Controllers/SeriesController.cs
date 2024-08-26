@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.Series;
 
 
@@ -9,7 +10,7 @@ namespace MoviesHubAPI.Controllers
     /// Controlador para la gestión de series y episodios.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class SeriesController : ControllerBase
     {
         private readonly ISerieService _serieService;
@@ -24,13 +25,25 @@ namespace MoviesHubAPI.Controllers
         }
 
         /// <summary>
-        /// Obtiene todas las series.
+        /// Obtiene todas las series con paginación.
         /// </summary>
-        /// <returns>Una lista de todas las series.</returns>
+        /// <param name="pageNumber">El número de página para la paginación. Debe ser mayor o igual a 1. El valor predeterminado es 1.</param>
+        /// <param name="pageSize">El tamaño de la página para la paginación. Debe ser mayor o igual a 1. El valor predeterminado es 10.</param>
+        /// <returns>Una respuesta que contiene una lista de todas las series paginadas. Si la página o el tamaño de página son inválidos, devuelve un código de estado 400 Bad Request con un mensaje de error.</returns>
+        /// <response code="200">Devuelve una lista paginada de series.</response>
+        /// <response code="400">Devuelve un error si el número de página o el tamaño de página son inválidos.</response>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Media>>> GetAllSeries()
+        public async Task<ActionResult<IEnumerable<MediaDto>>> GetAllSeries([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var series = await _serieService.GetAllSeriesAsync();
+            if (pageNumber < 1)
+            {
+                return BadRequest("El número de página debe ser mayor o igual a 1.");
+            }
+            if (pageSize < 1)
+            {
+                return BadRequest("El tamaño de página debe ser mayor o igual a 1.");
+            }
+            var series = await _serieService.GetAllSeriesAsync(pageNumber, pageSize);
             return Ok(series);
         }
 

@@ -15,7 +15,7 @@ namespace MoviesHubAPI.Services.Users
         public Task<List<User>> GetUsers();
 
         public Task<bool> DeleteUser(int id);
-        public Task<ActionResult> Login(LoginDto model);
+        public Task<User> Login(LoginDto model);
         public Task<string> AddRating(int userId, int mediaId, int rating);
         public Task<string> AddAction(int userId, int mediaId, string action);
         public Task<string> RemoveAction(int userId, int mediaId, string action);

@@ -13,10 +13,10 @@ namespace MoviesHubAPI.Services.Users
     {
         private readonly IContextDB _context;
         private readonly ILogger<UserService> _logger;
-        private readonly IAuthHelpers _authHelpers;
-        public UserService(IContextDB context, ILogger<UserService> logger,IAuthHelpers authHelper)
+        
+        public UserService(IContextDB context, ILogger<UserService> logger)
         {
-            _authHelpers = authHelper;
+           
             _context = context;
             _logger = logger;
         }
@@ -24,7 +24,7 @@ namespace MoviesHubAPI.Services.Users
         public async Task<User> RegisterUser(string name, string email, string password)
         {
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-            var user = new User { Name = name, Email = email, Password = hashedPassword };
+            var user = new User { Name = name, Email = email, Password = hashedPassword,Role="user" };
             _context.Users.Add(user);
             await _context.SaveChangesAsync(true);
             return user;
@@ -82,23 +82,17 @@ namespace MoviesHubAPI.Services.Users
             return true;
         }
 
-        public async Task<ActionResult>Login(LoginDto model)
+        public async Task<User> Login(LoginDto model)
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
             {
-                return new UnauthorizedObjectResult("Invalid email or password.");
+                return null;
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
-            {
-                return new UnauthorizedObjectResult("Invalid email or password.");
-            }
-
-            var token = _authHelpers.GenerateJWTToken(user);
-
-            return new OkObjectResult(new { user, token });
+            return user; 
         }
+
 
         public async Task<List<string>> LikeMedia(int userid)
         {

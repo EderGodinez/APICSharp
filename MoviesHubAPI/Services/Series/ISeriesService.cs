@@ -1,13 +1,14 @@
 ﻿
 
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 
 namespace MoviesHubAPI.Services.Series
 {
     public interface ISerieService
     {
-        Task<IEnumerable<Media>> GetAllSeriesAsync();
-        Task<Media> GetSeriesByIdAsync(int id);
+        Task<IEnumerable<MediaDto>> GetAllSeriesAsync(int pageNumber, int pageSize);
+        Task<MediaDto> GetSeriesByIdAsync(int id);
         Task CreateSeriesAsync(Media media);
         Task UpdateSeriesAsync(int id, Media media);
         Task DeleteSeriesAsync(int id);

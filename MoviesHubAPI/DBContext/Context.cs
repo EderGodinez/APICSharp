@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoviesHubAPI.Models;
 using MoviesHubAPI.Models.Configurations;
+using MoviesHubAPI.Services.DTOS;
 
 
 namespace EntityFrameworkExample.Context
@@ -24,7 +25,13 @@ namespace EntityFrameworkExample.Context
             modelBuilder.ApplyConfiguration(new SeasonConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UserActionConfiguration());
+            modelBuilder.Entity<TrendingDTO>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // No mapeado a una vista o tabla en la base de datos
+            });
         }
+        public DbSet<TrendingDTO> TrendingDTOs { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Media> Series { get; set; } 

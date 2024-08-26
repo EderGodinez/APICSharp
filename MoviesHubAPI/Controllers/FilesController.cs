@@ -6,7 +6,7 @@ using MoviesHubAPI.Services.Files;
 
 namespace MoviesHubAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class FilesController : ControllerBase
     {

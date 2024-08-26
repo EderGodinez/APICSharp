@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 
 
 namespace EntityFrameworkExample.Context
 {
     public interface IContextDB
     {
+        DbSet<TrendingDTO> TrendingDTOs { get; set; }
         DbSet<User> Users { get; set; }
         DbSet<Movie> Movies { get; set; }
-        DbSet<Media> Series { get; set; }  // Suponiendo que 'Serie' representa una colección de medios
+        DbSet<Media> Series { get; set; }  
         DbSet<Platform> Platforms { get; set; }
         DbSet<Gender> Genders { get; set; }
         DbSet<GenderList> GenderLists { get; set; }

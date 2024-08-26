@@ -1,22 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MoviesHubAPI.Helpers;
 using MoviesHubAPI.Models;
 using MoviesHubAPI.Services.UserDtos;
 using MoviesHubAPI.Services.Users;
 namespace MoviesHubAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IAuthHelpers _authHelpers;
         /// <summary>
         /// Se inicializa el controllador <see cref="UserController"/> class.
         /// </summary>
         /// <param name="userService">Servicio para gestion de usuarios.</param>
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger, IAuthHelpers authHelper)
         {
+            _authHelpers = authHelper;
             _userService = userService;
             _logger = logger;
         }
@@ -82,7 +85,13 @@ namespace MoviesHubAPI.Controllers
             {
                 return NotFound(new { message = "Usuario o contraseña incorrectos" });
             }
-            return Ok(new { message = "Login de usuario exitoso", user });
+            var token = _authHelpers.GenerateJWTToken(user);
+            return Ok(new
+            {
+                message = "Login de usuario exitoso",
+                user,
+                token 
+            });
         }
 
         /// <summary>
@@ -136,6 +145,7 @@ namespace MoviesHubAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto registerUserDto)
         {
+            Console.WriteLine("RegisterUserDto: ", registerUserDto);
             var user = await _userService.RegisterUser(registerUserDto.Name, registerUserDto.Email, registerUserDto.Password);
             return Ok(new { message = "Usuario creado correctamente", user });
         }
@@ -144,6 +154,7 @@ namespace MoviesHubAPI.Controllers
         /// </summary>
         /// <param name="id"> user ID.</param>
         /// <returns>Lista de medias que les gusta al usuario.</returns>
+        [Authorize]
         [ProducesResponseType(typeof(object), 200)]
         [ProducesResponseType(500)]
         [HttpGet("{id}/likes")]
@@ -157,6 +168,7 @@ namespace MoviesHubAPI.Controllers
         /// </summary>
         /// <param name="id"> user ID.</param>
         /// <returns>Lista de vistas que les gusta al usuario.</returns>
+        [Authorize]
         [ProducesResponseType(typeof(object), 200)]
         [ProducesResponseType(500)]
         [HttpGet("{id}/view")]

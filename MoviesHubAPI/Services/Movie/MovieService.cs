@@ -1,6 +1,8 @@
 ﻿using EntityFrameworkExample.Context;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.Movies.Responses;
 
 namespace MoviesHubAPI.Services.MovieS
@@ -111,9 +113,32 @@ namespace MoviesHubAPI.Services.MovieS
             return "Pelicula eliminada con exito";
         }
 
-        public async Task<IEnumerable<Movie>> GetTrendingMoviesAsync()
+        public async Task<IEnumerable<TrendingDTO>> GetTrendingMovies()
         {
-            return await _context.Movies.FromSqlRaw("EXEC GetTrendingMovies").ToListAsync();
+            var trendingMovies = await _context.TrendingDTOs
+                .FromSqlRaw("EXEC GetTrendingMovies")
+                .ToListAsync();
+
+            var trendingDTOs = trendingMovies.Select(movie => new TrendingDTO
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                OriginalTitle = movie.OriginalTitle,
+                Overview = movie.Overview,
+                ImagePath = movie.ImagePath,
+                PosterImage = movie.PosterImage,
+                TrailerLink = movie.TrailerLink,
+                WatchLink = movie.WatchLink,
+                AddedDate = movie.AddedDate,
+                TypeMedia = movie.TypeMedia,
+                RelaseDate = movie.RelaseDate,
+                AgeRate = movie.AgeRate,
+                IsActive = movie.IsActive
+            }).ToList();
+
+            return trendingDTOs;
         }
+
+       
     }
 }

@@ -2,6 +2,7 @@
 using EntityFrameworkExample.Context;
 using Microsoft.EntityFrameworkCore;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.Series;
 
 namespace MoviesHubAPI.Services
@@ -15,37 +16,99 @@ namespace MoviesHubAPI.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Media>> GetAllSeriesAsync()
+        public async Task<IEnumerable<MediaDto>> GetAllSeriesAsync(int pageNumber, int pageSize)
         {
-            return await _context.Series
-                .Include(m => m.GendersLists)
-                .ThenInclude(gl => gl.Gender)
-                .Where(m => m.TypeMedia == "series")
-                .ToListAsync();
+            //Obtengo los IDs de las series con paginación
+            int[] ids = await _context.Series
+            .Where(m => m.TypeMedia == "series")
+            .Select(m => m.Id)
+            .OrderBy(id => id) 
+            .Skip((pageNumber - 1) * pageSize) 
+            .Take(pageSize)
+            .ToArrayAsync();
+            var Series = new List<MediaDto>();
+            foreach (var id in ids)
+            {
+                var series = await GetSeriesByIdAsync(id);
+                if (series != null)
+                {
+                    Series.Add(series);
+                }
+            }
+            return Series;
         }
 
-        public async Task<Media> GetSeriesByIdAsync(int id)
+        public async Task<MediaDto> GetSeriesByIdAsync(int id)
         {
             var series = await _context.Series
-                .Include(m => m.GendersLists)
-                .ThenInclude(gl => gl.Gender)
-                .FirstOrDefaultAsync(m => m.Id == id && m.TypeMedia == "series");
+    .Include(m => m.GendersLists)
+        .ThenInclude(gl => gl.Gender)
+    .Include(m => m.MediaAvailibleIns)
+        .ThenInclude(ma => ma.Platform)
+    .Include(m => m.Seasons)
+        .ThenInclude(s => s.EpisodesLists)
+        .ThenInclude(el => el.Episode)
+     .Include(m => m.Ratings)
+    .FirstOrDefaultAsync(m => m.Id == id && m.TypeMedia == "series");
 
             if (series == null)
                 return null;
 
-            var episodes = await _context.Episodes
-        .Join(_context.EpisodeLists,
-            e => e.Id,
-            el => el.Episode.Id,  // Use the correct property name for the join
-            (e, el) => new { e, el })
-        .Where(joined => joined.el.Seasonld == series.Id)  // Use the correct property name for the join condition
-        .Select(joined => joined.e)
-        .ToListAsync();
+            series.GendersLists = series.GendersLists
+                .Select(gl => new GenderList { Gender = new Gender { Name = gl.Gender.Name } })
+                .ToList();
 
-            series.Episodes = episodes;
+            series.MediaAvailibleIns = series.MediaAvailibleIns
+                .Select(ma => new MediaAvailibleIn { Platform = new Platform { Name = ma.Platform.Name } })
+                .ToList();
 
-            return series;
+            var groupedEpisodes = series.Seasons
+                .Select(season => new
+                {
+                    SeasonId = season.Seasonld,
+                    NumSeason = season.NumSeason,
+                    Episodes = season.EpisodesLists.Select(el => el.Episode).ToList()
+                })
+                .ToList();
+
+            // Mapeo del objeto DTO
+            return new MediaDto
+            {
+                Id = series.Id,
+                Title = series.Title,
+                OriginalTitle = series.OriginalTitle,
+                Overview = series.Overview,
+                ImagePath = series.ImagePath,
+                PosterImage = series.PosterImage,
+                TrailerLink = series.TrailerLink,
+                WatchLink = series.WatchLink,
+                AddedDate = series.AddedDate,
+                TypeMedia = series.TypeMedia,
+                RelaseDate = series.RelaseDate,
+                AgeRate = series.AgeRate,
+                IsActive = series.IsActive,
+                GendersLists = series.GendersLists.Select(gl => gl.Gender.Name).ToList(),
+                MediaAvailibleIns = series.MediaAvailibleIns.Select(ma => ma.Platform.Name).ToList(),
+                Seasons = groupedEpisodes.Select(season => new SeasonDto
+                {
+                    SeasonId = season.SeasonId,
+                    NumSeason = season.NumSeason,
+                    Episodes = season.Episodes.Select(e => new EpisodeDto
+                    {
+                        Id = e.Id,  
+                        Title = e.Title,
+                        Overview = e.Overview,
+                        E_Num = e.E_Num,  
+                        Duration = e.Duration,
+                        ImagePath = e.ImagePath,
+                        AddedDate = e.AddedDate,
+                        WatchLink = e.WatchLink,
+                        RelaseDate = e.RelaseDate
+                    }).ToList()
+                }).ToList(),
+                Rating = series.Ratings != null && series.Ratings.Count > 0 ? (float)series.Ratings.Average(r => r.Rate) : null,
+                Votes = series.Ratings?.Count ?? 0
+            };
         }
 
         public async Task CreateSeriesAsync(Media media)
@@ -61,7 +124,6 @@ namespace MoviesHubAPI.Services
             if (existingSeries == null)
                 return;
 
-            // Update the existing series with new data
             _context.Entry(existingSeries).CurrentValues.SetValues(media);
             await _context.SaveChangesAsync();
         }
@@ -101,7 +163,6 @@ namespace MoviesHubAPI.Services
             if (existingEpisode == null)
                 return;
 
-            // Update the existing episode with new data
             _context.Entry(existingEpisode).CurrentValues.SetValues(episode);
             await _context.SaveChangesAsync();
         }
