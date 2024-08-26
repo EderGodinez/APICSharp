@@ -30,6 +30,10 @@ namespace MoviesHubAPI
             builder.Services.AddTransient<IMovieService, MovieService>();
             builder.Services.AddTransient<ISerieService, SerieService>();
             builder.Services.AddScoped<IAuthHelpers, AuthHelpers>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
             // Add services to the container.
             builder.Services.AddDbContext<ContextDB>(options =>
             {
@@ -55,6 +59,7 @@ namespace MoviesHubAPI
                     ClockSkew = TimeSpan.Zero
                 };
             });
+            
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
@@ -79,11 +84,11 @@ namespace MoviesHubAPI
                     docs.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieHub docs v1");
                 });
             }
-            app.UseCors("*");
+            
             app.UseHttpsRedirection(); 
             
             app.UseStaticFiles();
-
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
