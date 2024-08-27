@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesHubAPI.Helpers;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.UserDtos;
 using MoviesHubAPI.Services.Users;
 namespace MoviesHubAPI.Controllers
@@ -81,6 +82,7 @@ namespace MoviesHubAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var user = await _userService.Login(loginDto);
+            Console.WriteLine("User: ", user);
             if (user == null)
             {
                 return NotFound(new { message = "Usuario o contraseña incorrectos" });
@@ -148,6 +150,20 @@ namespace MoviesHubAPI.Controllers
             Console.WriteLine("RegisterUserDto: ", registerUserDto);
             var user = await _userService.RegisterUser(registerUserDto.Name, registerUserDto.Email, registerUserDto.Password);
             return Ok(new { message = "Usuario creado correctamente", user });
+        }
+        /// <summary>
+        /// Entrea la lista de medias que les gusta al usuario.
+        /// </summary>
+        /// <param name="id"> user ID.</param>
+        /// <returns>Lista de medias que les gusta al usuario.</returns>
+        //[Authorize]
+        [ProducesResponseType(typeof(object), 200)]
+        [ProducesResponseType(500)]
+        [HttpPost("{userid}/action")]
+        public async Task<IActionResult> AddLike(int userid, [FromQuery] AddActionDto addActionDto)
+        {
+            var resp = await _userService.AddAction(userid,addActionDto);
+            return Ok(new { Message = resp  });
         }
         /// <summary>
         /// Entrea la lista de medias que les gusta al usuario.

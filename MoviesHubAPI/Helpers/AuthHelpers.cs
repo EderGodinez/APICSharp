@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using MoviesHubAPI.Services.Users.Responses;
 
 namespace MoviesHubAPI.Helpers
 {
@@ -16,7 +17,7 @@ namespace MoviesHubAPI.Helpers
             _configuration = configuration;
         }
 
-        public string GenerateJWTToken(User user)
+        public string GenerateJWTToken(userResponse user)
         {
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),

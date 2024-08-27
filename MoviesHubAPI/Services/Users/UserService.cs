@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using MoviesHubAPI.Helpers;
 using MoviesHubAPI.Models;
+using MoviesHubAPI.Services.DTOS;
 using MoviesHubAPI.Services.UserDtos;
+using MoviesHubAPI.Services.Users.Responses;
 
 
 namespace MoviesHubAPI.Services.Users
@@ -82,7 +84,7 @@ namespace MoviesHubAPI.Services.Users
             return true;
         }
 
-        public async Task<User> Login(LoginDto model)
+        public async Task<userResponse> Login(LoginDto model)
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
@@ -90,17 +92,26 @@ namespace MoviesHubAPI.Services.Users
                 return null;
             }
 
-            return user; 
+            userResponse response = new userResponse
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                FavoritesMediaId= await LikeMedia(user.Id)
+            };
+
+            return response; 
         }
 
 
-        public async Task<List<string>> LikeMedia(int userid)
+        public async Task<List<int>> LikeMedia(int userid)
         {
             try
             {
                 var resp = await _context.UserActions
                     .Where(u => u.UserId == userid && u.TypeAction.Equals("L"))
-                    .Select(u => u.MediaId.ToString())
+                    .Select(u => u.MediaId)
                     .ToListAsync();
 
                 return resp;
@@ -108,17 +119,17 @@ namespace MoviesHubAPI.Services.Users
             catch (Exception ex)
             {
                 Console.WriteLine($"Error al obtener medios con 'me gusta' para el usuario {userid}: {ex.Message}");
-                return new List<string>(); 
+                return new List<int>(); 
             }
         }
 
-        public async Task<List<string>> ViewMedia(int userid)
+        public async Task<List<int>> ViewMedia(int userid)
         {
             try
             {
                 var resp = await _context.UserActions
                     .Where(u => u.UserId == userid && u.TypeAction == "V")
-                    .Select(u => u.MediaId.ToString())
+                    .Select(u => u.MediaId)
                     .ToListAsync();
 
                 return resp;
@@ -126,7 +137,7 @@ namespace MoviesHubAPI.Services.Users
             catch (Exception ex)
             {
                 Console.WriteLine($"Error al obtener medios vistos para el usuario {userid}: {ex.Message}");
-                return new List<string>(); 
+                return new List<int>(); 
             }
         }
         public async Task<string> AddRating(int userId, int mediaId, int rating)
@@ -162,33 +173,32 @@ namespace MoviesHubAPI.Services.Users
             }
         }
 
-        public async Task<string> AddAction(int userId, int mediaId, string action)
+        public async Task<string> AddAction(int userId,AddActionDto infoAction)
         {
             try
             {
                 var existingAction = await _context.UserActions
-                    .FirstOrDefaultAsync(a => a.UserId == userId && a.MediaId == mediaId && a.TypeAction == action);
+                    .FirstOrDefaultAsync(a => a.UserId == userId && a.MediaId == infoAction.MediaId && a.TypeAction == infoAction.Action);
 
                 if (existingAction != null)
                 {
-                    return "Action already exists";
+                    return "Accion solicitada ya existe";
                 }
                 else
                 {
                     var newAction = new UserAction
                     {
                         UserId = userId,
-                        MediaId = mediaId,
-                        TypeAction = action
+                        MediaId = infoAction.MediaId,
+                        TypeAction = infoAction.Action
                     };
                     await _context.UserActions.AddAsync(newAction);
                     await _context.SaveChangesAsync(true);
-                    return "Action added successfully";
+                    return "Accion de usuario agregado exitosamente";
                 }
             }
             catch (Exception ex)
             {
-                // Log exception
                 return $"Error while adding action: {ex.Message}";
             }
         }

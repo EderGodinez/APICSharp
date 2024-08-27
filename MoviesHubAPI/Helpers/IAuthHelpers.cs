@@ -1,9 +1,10 @@
-﻿using MoviesHubAPI.Models;
+﻿
+using MoviesHubAPI.Services.Users.Responses;
 
 namespace MoviesHubAPI.Helpers
 {
     public interface IAuthHelpers
     {
-        string GenerateJWTToken(User user);
+        string GenerateJWTToken(userResponse user);
     }
 }
