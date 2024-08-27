@@ -46,6 +46,41 @@ El proceso de desarrollo estuvo compuesto por 4 fases, en las primeras 4 se desa
   ### Clonar repositorio de Backed
 -- Instala de los paquetes y módulos requeridos para asp.net core:  
 ```dotnet restore```  
+## Configuración del archivo `appsettings.json`
+
+El archivo `appsettings.json` es una parte esencial de la configuración de una aplicación .NET. En este archivo se almacenan configuraciones clave como cadenas de conexión, configuraciones de la aplicación, y otros valores que pueden variar según el entorno (desarrollo, producción, etc.).
+
+### 1. Creación del archivo `appsettings.json`
+
+En tu proyecto .NET, el archivo `appsettings.json` se crea automáticamente cuando se inicializa un nuevo proyecto. Si no tienes este archivo, puedes crearlo manualmente en la raíz del proyecto:
+
+1. En el Explorador de Soluciones, haz clic derecho en la raíz del proyecto.
+2. Selecciona **Agregar** > **Nuevo Elemento**.
+3. Elige **Archivo JSON** y nómbralo `appsettings.json`.
+
+### 2. Estructura básica del archivo `appsettings.json`
+
+El archivo `appsettings.json` es un archivo JSON que sigue una estructura de clave-valor. Aquí tienes un ejemplo básico:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "url de conexion a DB"
+  },
+  "ApplicationSettings": {
+    "JWT_Secret": "JWT_Key_secret",
+    "JWT_Issuer": "nombre de app", 
+    "JWT_Audience": "nombre de app" 
+  }
+}
+```
 ### 
 
 -- Ejecuta el servicio de Docker como por ejemplo docker-desktop o minikube   
