@@ -14,7 +14,8 @@ namespace MoviesHubAPI.Models.Configurations
                 .HasMaxLength(1);
 
             builder.Property(ua => ua.ActionDate)
-                .IsRequired();
+            .HasDefaultValueSql("GETDATE()");
+
 
             builder.HasOne(ua => ua.User)
                 .WithMany(u => u.UserActions)

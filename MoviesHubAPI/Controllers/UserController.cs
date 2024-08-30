@@ -184,7 +184,7 @@ namespace MoviesHubAPI.Controllers
         /// </summary>
         /// <param name="id"> user ID.</param>
         /// <returns>Lista de vistas que les gusta al usuario.</returns>
-        [Authorize]
+        //[Authorize]
         [ProducesResponseType(typeof(object), 200)]
         [ProducesResponseType(500)]
         [HttpGet("{id}/view")]
