@@ -1,10 +1,8 @@
-﻿using MoviesHubAPI.Models;
-
-namespace MoviesHubAPI.Services.Movies.Responses
+﻿namespace MoviesHubAPI.Services.Movies.Responses
 {
     public interface IMovieResponse
     {
-        Media _Media { get; set; }
+        MediaMovie MovieData { get; set; }
         TimeSpan? Duration { get; set; }
         List<string> GenderLists { get; set; }
     }

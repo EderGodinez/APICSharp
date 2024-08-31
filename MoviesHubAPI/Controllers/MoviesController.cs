@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoviesHubAPI.Models;
 using MoviesHubAPI.Services.DTOS;
+using MoviesHubAPI.Services.Movies.Responses;
 using MoviesHubAPI.Services.MovieS;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,7 +21,7 @@ namespace MoviesHubAPI.Controllers
         /// </summary>
         /// <returns>Lista de películas.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
+        public async Task<ActionResult<IEnumerable<MovieResponse>>> GetAllMovies()
         {
             var movies = await _movieService.GetAllMoviesAsync();
             return Ok(movies);
@@ -44,7 +45,7 @@ namespace MoviesHubAPI.Controllers
         /// <param name="id">ID de la película.</param>
         /// <returns>Película solicitada o error.</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovieById(int id)
+        public async Task<ActionResult<MovieResponse>> GetMovieById(int id)
         {
             var movie = await _movieService.GetMovieByIdAsync(id);
             if (movie == null)

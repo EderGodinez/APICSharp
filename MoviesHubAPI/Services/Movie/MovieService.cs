@@ -21,7 +21,7 @@ namespace MoviesHubAPI.Services.MovieS
                     .ThenInclude(gl => gl.GendersLists)
                 .Select(m => new MovieResponse
                 {
-                    _Media = new Media
+                    MovieData = new MediaMovie
                     {
                         Id = m.Media.Id,
                         Title = m.Media.Title,
@@ -32,15 +32,15 @@ namespace MoviesHubAPI.Services.MovieS
                         TrailerLink = m.Media.TrailerLink,
                         WatchLink = m.Media.WatchLink,
                         AddedDate = m.Media.AddedDate,
-                        TypeMedia = m.Media.TypeMedia,
                         RelaseDate = m.Media.RelaseDate,
                         AgeRate = m.Media.AgeRate,
-                        IsActive = m.Media.IsActive
+                        IsActive = m.Media.IsActive,
+                        TypeMedia = m.Media.TypeMedia,
                     },
                     Duration = m.Duration,
                     GenderLists = m.Media.GendersLists.Select(gl => gl.Gender.Name).ToList()
                 })
-    .OrderBy(m => m._Media.Id)
+    .OrderBy(m => m.MovieData.Id)
     .ToListAsync();
         }
 
@@ -52,7 +52,7 @@ namespace MoviesHubAPI.Services.MovieS
         .Where(m => m.MediaId == id && m.Media.TypeMedia == "movie")
         .Select(m => new MovieResponse
         {
-            _Media = new Media
+            MovieData = new MediaMovie
             {
                 Id = m.Media.Id,
                 Title = m.Media.Title,
@@ -63,10 +63,11 @@ namespace MoviesHubAPI.Services.MovieS
                 TrailerLink = m.Media.TrailerLink,
                 WatchLink = m.Media.WatchLink,
                 AddedDate = m.Media.AddedDate,
-                TypeMedia = m.Media.TypeMedia,
                 RelaseDate = m.Media.RelaseDate,
                 AgeRate = m.Media.AgeRate,
-                IsActive = m.Media.IsActive
+                IsActive = m.Media.IsActive,
+                TypeMedia = m.Media.TypeMedia
+                                
             },
             Duration = m.Duration,
             GenderLists = m.Media.GendersLists.Select(gl => gl.Gender.Name).ToList()
